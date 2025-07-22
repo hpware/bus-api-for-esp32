@@ -8,7 +8,7 @@ This is submitted to SoM: https://summer.hackclub.com/projects/7617/
 ## How can you try it?
 First, register the TDX api from here: https://tdx.transportdata.tw/
 
-Note that you **MUST** be a Taiwanese citizen to register the TDX api, and this takes a few days to get approved by the government!
+Note that this may take a few days to get approved by the government!
 
 Second, setup your server.
 1. Get your server provider, this can be Vercel, Netlify, Your own infra, etc...
