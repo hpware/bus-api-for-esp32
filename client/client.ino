@@ -12,6 +12,8 @@ unsigned long lastGetLatestBusInfo = 0;
 DynamicJsonDocument latestBusInfo(1024);
 
 int currentBusIndex = 0;
+int buttonStatus = 0;
+bool DisplayType = true;
 unsigned long lastBusSwitch = 0;
 const unsigned long busSwitchInterval = 1000;
 
@@ -28,6 +30,7 @@ void setup() {
   oled.setCursor(0, 20);
   oled.print("......");
   oled.sendBuffer();
+  pinMode(button, LOW);
 
   WiFi.begin(ssid, password);
 
@@ -40,6 +43,11 @@ void setup() {
 }
 
 void loop() {
+  buttonStatus = digitalRead(button);
+  if (buttonStatus == HIGH) {
+    DisplayType = !DisplayType; 
+    currentBusIndex = 0;
+  }
   unsigned long currentMillis = millis();
   if (!isInitialized || currentMillis - lastGetLatestBusInfo >= reReadInterval) {
     if (debug) {
@@ -49,24 +57,27 @@ void loop() {
     lastGetLatestBusInfo = currentMillis;
     currentBusIndex = 0;
   }
-  if (latestBusInfo.size() > 0 && currentMillis - lastBusSwitch >= busSwitchInterval) {
-    currentBusIndex = (currentBusIndex + 1) % latestBusInfo.size();
-    lastBusSwitch = currentMillis;
+  if (DisplayType) {
+    if (latestBusInfo.size() > 0 && currentMillis - lastBusSwitch >= busSwitchInterval) {
+      currentBusIndex = (currentBusIndex + 1) % latestBusInfo.size();
+      lastBusSwitch = currentMillis;
+    }
+    oled.clearBuffer();
+    oled.setFont(u8g2_font_10x20_tr);
+    oled.setCursor(0, 20);
+  
+    if (latestBusInfo.size() > 0) {
+      oled.print(latestBusInfo[currentBusIndex]["RouteName"]["En"].as<String>());
+    } else {
+      oled.print("No Data");
+    }
+    oled.setCursor(10, 40);
+    oled.setFont(u8g2_font_courB24_tr);
+    oled.print(latestBusInfo[currentBusIndex]["EstimateTime"].as<int>() / 60);
+    oled.print(" min");
+    oled.sendBuffer();
   }
-  oled.clearBuffer();
-  oled.setFont(u8g2_font_10x20_tr);
-  oled.setCursor(0, 20);
-
-  if (latestBusInfo.size() > 0) {
-    oled.print(latestBusInfo[currentBusIndex]["RouteName"]["En"].as<String>());
-  } else {
-    oled.print("No Data");
-  }
-  oled.setCursor(10, 40);
-  oled.setFont(u8g2_font_callite24_tr);
-  oled.print(latestBusInfo[currentBusIndex]["EstimateTime"].as<String>());
-  oled.sendBuffer();
-  delay(1000);
+  delay(2000);
 }
 
 void getLatestBusInfo() {
