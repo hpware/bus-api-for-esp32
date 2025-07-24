@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
     }
     if (event.node.req.method === 'POST' || event.node.req.method === 'GET') {
         try {
-            const url = `https://tdx.transportdata.tw/api/advanced/v2/Bus/EstimatedTimeOfArrival/City/Taipei/PassThrough/Station/${"107"}?%24top=30&%24format=JSON`
+            const url = `https://tdx.transportdata.tw/api/advanced/v2/Bus/EstimatedTimeOfArrival/City/Taipei/PassThrough/Station/${slug}?%24top=30&%24format=JSON`
             const data = await BUS(url);
             return data;
         } catch (e) {
